@@ -1,0 +1,40 @@
+Web Development
+
+# Potenza's Vagrant Scripts!
+
+## What is this?
+[Vagrant](https://www.vagrantup.com/) is a software that allows you to quickly create and configure virtual development environments. This is great to have in a team as it ensures that there are no discrepancies or unknown dependencies across developers, and ensures smooth sailing when it comes to deploying to productions environments!   
+
+[Puppet](https://puppetlabs.com/) is a configuration management software that will allow us to define how we want our virtual machine to be configured. Puppet is amazing! It will allow us to automatically install and configure *all* of the tools we will need to run our applications.
+
+## Installation   
+
+**Side Note:** using vagrant is entirely a terminal process, if you're using Windows, which has no built in terminal, I *highly* recommend following this guide: [Get a functional and sleek console in windows](https://scotch.io/tutorials/get-a-functional-and-sleek-console-in-windows)
+
+* Install [Vagrant](https://www.vagrantup.com/docs/installation/), you can now invoke vagrant by typing 'vagrant' into your terminal.
+* Install the vagrant plugin 'dotenv'. In your terminal, type ```vagrant plugin install vagrant-env```
+* Copy .env.example to .env, set the variables as desired (Read the section on DotEnv for more information)
+* Type ```vagrant up --provision```, The server will begin automatically downloading and provisioning itself.
+* You may access the virtual machine by typing ```vagrant ssh``` in the directory of Vagrantfile.
+* You may access the server at http://127.0.0.1:HOSTPORT, where HOSTPORT is what you defined in your .env file.
+
+## DotEnv
+dotenv is a popular resource that allows the usage of a .env file in an application. The benefit of this is that a .env file **is not to be** stored in the git repository. This allows the developer to use *developer specific variables* when configuring their vagrant machine, variables that can be completely different from another developer, while still utilizing the same repository.   
+
+In the source, you will see a .env.example file, which is simply a key-value store, you will see variables defined like this, ```HOSTPORT=80```. These variables are stored in an array when the dotenv resource is loaded, and is referenced as ```ENV['HOSTPORT']```. The current variables are: 
+
+* GUESTPORT - This is the port that the virtual machine will use to be forwarded to the host port.
+* HOSTPORT - This is the port that will be used to access the vm's web server.
+* APPFOLDER - This is where the application is stored, that you would want to use with this server.   
+
+*It is advised that you do not touch guest port*, it is set to 6767 to avoid possible collisions, only change host port to determine which port to access your application from.   
+
+The actual application folder will rest on your host machine. Vagrant will create a *symbolic link* to the folder you specify and the folder in the vm. This will enable you to use whichever tools you prefer in your local environment: vim, sublime text, phpstorm, etc. on files present in your vm as well.
+
+## Considerations
+* This script requires Vagrant version 1.7.4 or later to run.
+* This script uses nginx and fastcgi to serve the web application. This is, at the time, not typical of our applications, but I believe we will be moving to this in the future.
+* MySQL credentials is defaulted to user: root and password: root.
+* Host name is set to 'vagrant-potenza', which is the name of a development environment in our core framework (located in public/env.php)
+* Configuration of the application is not automated. You will still need to install the modules in the core and run your migrations.
+* **WARNING** - Directly modifying the virtual machine through virtualbox, or attempting to use NFS on shared folders could potentially result in the corruption of your vagrant box, broken symlinks, and ssh authentication errors, tread carefully when attempting to improve the performance of your VM.
